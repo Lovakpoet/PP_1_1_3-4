@@ -6,11 +6,13 @@ import jm.task.core.jdbc.util.Util;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
+
 public class UserDaoJDBCImpl implements UserDao {
         public UserDaoJDBCImpl() {
-
+            // The empty constructor is specified in the task
         }
-
+        private static final Logger log = Logger.getLogger(UserDaoJDBCImpl.class.getName());
         private final Connection connection = Util.getConnection();
 
         public void createUsersTable() {
@@ -24,11 +26,10 @@ public class UserDaoJDBCImpl implements UserDao {
                       age INT NOT NULL,
                       PRIMARY KEY (id))
                     """);
-
-                System.out.println("CREATE TABLE OK!");
+                log.info( "CREATE TABLE OK!");
 
             } catch (SQLException e) {
-                throw new RuntimeException("CREATE TABLE FAIL!", e);
+                log.warning(e + ": (CREATE TABLE FAIL!)");
 
             }
 
@@ -38,9 +39,11 @@ public class UserDaoJDBCImpl implements UserDao {
 
             try (Statement statement = connection.createStatement()) {
                 statement.executeUpdate("DROP TABLE IF EXISTS users");
-                System.out.println("DROP TABLE OK!");
+
+                log.info( "DROP TABLE OK!");
+
             } catch (SQLException e) {
-                throw new RuntimeException("DROP TABLE FAIL!", e);
+               log.warning(e + ": (DROP TABLE FAIL!)");
             }
 
         }
@@ -53,10 +56,11 @@ public class UserDaoJDBCImpl implements UserDao {
                 preparedStatement.setString(2, lastName);
                 preparedStatement.setByte(3, age);
                 preparedStatement.executeUpdate();
-                System.out.println("SAVE USER OK!");
+
+                log.info("SAVE USER OK!");
 
             } catch (SQLException e) {
-                throw new RuntimeException("SAVE USER FAIL!", e);
+                log.warning(e + ": (SAVE USER FAIL!)");
             }
 
         }
@@ -68,9 +72,11 @@ public class UserDaoJDBCImpl implements UserDao {
             try (PreparedStatement preparedStatement = connection.prepareStatement(removeID)) {
                 preparedStatement.setLong(1, id);
                 preparedStatement.executeUpdate();
-                System.out.println("DELETE user... OK!");
+
+                log.info( "DELETE USER OK!");
+
             } catch (SQLException e) {
-                throw new RuntimeException("DELETE user... FAIL!", e);
+                log.warning(e + ": (DELETE USER FAIL!)");
             }
 
         }
@@ -89,12 +95,12 @@ public class UserDaoJDBCImpl implements UserDao {
                     user.setAge(resultSet.getByte("age"));
 
                     userList.add(user);
-                    System.out.println("ALL USERS OK!");
+                    log.info( "GET ALL USERS OK!");
                 }
 
 
             } catch (SQLException e) {
-                throw new RuntimeException("ALL USERS FAIL!", e);
+                log.warning(e + ": (GET ALL USERS FAIL!)");
             }
             return userList;
         }
@@ -103,10 +109,10 @@ public class UserDaoJDBCImpl implements UserDao {
 
             try (Statement statement = connection.createStatement()) {
                 statement.executeUpdate("TRUNCATE TABLE users");
-                System.out.println("CLEANING TABLE OK");
+                log.info( "CLEANING TABLE OK");
 
             } catch (SQLException e) {
-                throw new RuntimeException("CLEANING TABLE FAIL!", e);
+                log.warning(e + ": (CLEANING TABLE FAIL!)");
             }
 
         }
